@@ -3,7 +3,9 @@ package com.jb.supermercado.internal.usuario.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "TB_USUARIO")
+@Table(name = "TB_USU" +
+        "" +
+        "ARIO")
 public class UsuarioEntity {
 
     @Id
