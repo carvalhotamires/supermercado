@@ -54,4 +54,36 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
+    // 1. Trata erro genérico 500 (Qualquer erro inesperado)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErroPadraoResponse> handleGenericException(Exception ex) {
+        ErroPadraoResponse response = new ErroPadraoResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Erro interno no servidor",
+                "Ocorreu um erro inesperado. Tente novamente mais tarde."
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    // 2. Trata erros de conversão de tipos na URL (ex: letras no ID)
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErroPadraoResponse> handleTypeMismatch(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex) {
+        ErroPadraoResponse response = new ErroPadraoResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Tipo de parâmetro inválido",
+                String.format("O parâmetro '%s' esperava o tipo '%s'", ex.getName(), ex.getRequiredType().getSimpleName())
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    // 3. Trata JSON malformado na requisição
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErroPadraoResponse> handleHttpMessageNotReadable(org.springframework.http.converter.HttpMessageNotReadableException ex) {
+        ErroPadraoResponse response = new ErroPadraoResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Corpo da requisição inválido",
+                "Verifique a sintaxe do seu JSON ou os tipos dos campos."
+        );
+        return ResponseEntity.badRequest().body(response);
+    }
 }
